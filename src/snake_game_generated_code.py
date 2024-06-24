@@ -18,12 +18,10 @@ w = curses.newwin(sh, sw, 0, 0)
 w.box()
 
 # Accept keypad input
-w.keypad(1)
+w.keypad(True)
 
 # Control the speed of the game
 w.timeout(100)
-
-# Rest of your code...
 
 # Initial snake position
 snk_x = sw//4
@@ -38,6 +36,21 @@ snake = [
 
 # Initial food position
 food = [sh//2, sw//2]
+
+# Create a list to store the positions of the obstacles
+obstacles = []
+
+# Generate random positions for the obstacles
+for _ in range(10):  # Change this number to control the number of obstacles
+    while True:
+        obstacle = [random.randint(1, sh-2), random.randint(1, sw-2)]
+        if obstacle not in obstacles and obstacle not in snake and obstacle != food:
+            obstacles.append(obstacle)
+            break
+
+# Draw the obstacles on the screen
+for obstacle in obstacles:
+    w.addch(obstacle[0], obstacle[1], '#')
 
 # Add the food to the screen
 w.addch(int(food[0]), int(food[1]), curses.ACS_PI)
@@ -72,8 +85,16 @@ while True:
     # Insert new head of the snake
     snake.insert(0, new_head)
 
-    # Check if game over (snake runs into itself)
-    if snake[0] in snake[1:]:
+    # Check if game over (snake runs into itself or an obstacle)
+    if snake[0] in snake[1:] or snake[0] in obstacles:
+        # Clear the window
+        w.clear()
+        # Display game over message
+        w.addstr(sh // 2, sw // 2, 'Game Over!')
+        # Refresh the window to show the message
+        w.refresh()
+        # Wait for a few seconds to let the player see the message
+        curses.napms(2000)
         # End the window
         curses.endwin()
         # Quit the game
