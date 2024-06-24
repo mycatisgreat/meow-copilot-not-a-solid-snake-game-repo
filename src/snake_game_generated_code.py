@@ -14,11 +14,16 @@ sh, sw = s.getmaxyx()
 # Create a new window using screen height and width
 w = curses.newwin(sh, sw, 0, 0)
 
+# Draw a border around the window
+w.box()
+
 # Accept keypad input
 w.keypad(1)
 
 # Control the speed of the game
 w.timeout(100)
+
+# Rest of your code...
 
 # Initial snake position
 snk_x = sw//4
@@ -44,17 +49,8 @@ key = curses.KEY_RIGHT
 while True:
     # Get the next key
     next_key = w.getch()
-    # If no key is pressed, use the previous key
+    # If a key is pressed, use it as the next key
     key = key if next_key == -1 else next_key
-
-    # Check if game over (snake runs into border or itself)
-    if snake[0][0] in [0, sh] or \
-        snake[0][1]  in [0, sw] or \
-        snake[0] in snake[1:]:
-        # End the window
-        curses.endwin()
-        # Quit the game
-        quit()
 
     # Calculate the new head of the snake
     new_head = [snake[0][0], snake[0][1]]
@@ -69,8 +65,19 @@ while True:
     if key == curses.KEY_RIGHT:
         new_head[1] += 1
 
+    # Wrap the snake's position if it hits the border
+    new_head[0] = new_head[0] % (sh - 1)
+    new_head[1] = new_head[1] % (sw - 1)
+
     # Insert new head of the snake
     snake.insert(0, new_head)
+
+    # Check if game over (snake runs into itself)
+    if snake[0] in snake[1:]:
+        # End the window
+        curses.endwin()
+        # Quit the game
+        quit()
 
     # Check if snake has eaten the food
     if snake[0] == food:
