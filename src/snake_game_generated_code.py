@@ -23,6 +23,12 @@ w.keypad(True)
 # Control the speed of the game
 w.timeout(100)
 
+# Initialize the score
+score = 0
+
+# Add the score to the screen
+w.addstr(0, 0, 'Score: ' + str(score))
+
 # Initial snake position
 snk_x = sw//4
 snk_y = sh//2
@@ -104,11 +110,15 @@ while True:
     if snake[0] == food:
         # If so, set food to None
         food = None
+        # Increase the score
+        score += 1
+        # Update the score on the screen
+        w.addstr(0, 0, 'Score: ' + str(score))
         while food is None:
             # Create new food
             nf = [
-                random.randint(1, sh-1),
-                random.randint(1, sw-1)
+                random.randint(1, sh - 1),
+                random.randint(1, sw - 1)
             ]
             # If the new food position is not part of the snake, place it on the screen
             food = nf if nf not in snake else None
